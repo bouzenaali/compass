@@ -3,33 +3,21 @@ from django.db import models
 # Create your models here.
 
 class Person():
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
+    name = models.CharField(max_length=255)
+    phone = models.FloatField()
+    mail = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
-
-
+    
 class Student(Person):
-    def __init__(self, name, age):
-        super().__init__(name, age)
-
     def __str__(self):
-        return self.name + " " + str(self.grade)
+        return self.name
     
-
 class Teacher(Person):
-    def __init__(self, name, age):
-        super().__init__(name, age)
-
     def __str__(self):
-        return self.name + " " + self.subject
+        return self.name
     
-
 class admin():
-    def __init__(self, name, age):
-        super().__init__(name, age)
-
     def __str__(self):
         return self.name
