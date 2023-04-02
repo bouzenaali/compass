@@ -21,7 +21,7 @@ class Level(models.Model):
 
 
 class Group(models.Model):
-    name = models.CharField(max_length=255)
+    number = models.FloatField(max_length=255)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher)
 
