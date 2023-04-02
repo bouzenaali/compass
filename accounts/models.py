@@ -18,6 +18,6 @@ class Teacher(Person):
     def __str__(self):
         return self.name
     
-class admin():
+class Admin():
     def __str__(self):
         return self.name
