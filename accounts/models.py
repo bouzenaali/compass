@@ -1,5 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+
+
+
+
 
 class Person(models.Model):
     name = models.CharField(max_length=255)
@@ -11,13 +17,13 @@ class Person(models.Model):
         return self.name
     
 class Student(Person):
-    courses = models.ManyToManyField('courses.Course', related_name='students')
+    courses = models.ManyToManyField('courses.Course', related_name='students',blank=True, null=True)
     is_present = models.BooleanField(default=False)
     def __str__(self):
         return self.name
     
 class Teacher(Person):
-    courses = models.ManyToManyField('courses.Course', related_name='teachers')
+    courses = models.ManyToManyField('courses.Course', related_name='teachers',blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -32,11 +38,37 @@ class SuperUser(Admin):
         def __str__(self):
             return self.name
 
-# Create teacher group
-teachers_g = Group.objects.create(name='teachers_g')
+# roles
+class User(AbstractUser):
+    STUDENT = 1
+    TEACHER = 2
+    ADMIN = 3
+    SUPERUSER = 4
 
-# Create admin group
-admins_g = Group.objects.create(name='admins_g')
+    ROLE_CHOICES = (
+        (STUDENT, 'Student'),
+        (TEACHER, 'Teacher'),
+        (ADMIN, 'Admin'),
+        (SUPERUSER, 'superuser')
+    )
 
-# Create superuser group
-superusers_g = Group.objects.create(name='superusers_g')
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=STUDENT)
+
+    # add related_name to avoid clashes with auth.User
+    groups = models.ManyToManyField(
+        Group,
+        related_name='accounts_users_groups',
+        blank=True,
+        verbose_name=('groups'),
+        help_text=(
+            'The groups this user belongs to. A user will get all permissions '
+            'granted to each of their groups.'
+    ),
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='accounts_users_permissions',
+        blank=True,
+        verbose_name=('user permissions'),
+        help_text=('Specific permissions for this user.'),
+    )
