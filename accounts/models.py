@@ -32,38 +32,3 @@ class Admin(Person):
     def __str__(self):
         return self.name
     
-
-# roles
-class User(AbstractUser):
-    STUDENT = 1
-    TEACHER = 2
-    ADMIN = 3
-    SUPERUSER = 4
-
-    ROLE_CHOICES = (
-        (STUDENT, 'Student'),
-        (TEACHER, 'Teacher'),
-        (ADMIN, 'Admin'),
-        (SUPERUSER, 'superuser')
-    )
-
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=STUDENT)
-
-    # add related_name to avoid clashes with auth.User
-    groups = models.ManyToManyField(
-        Group,
-        related_name='accounts_users_groups',
-        blank=True,
-        verbose_name=('groups'),
-        help_text=(
-            'The groups this user belongs to. A user will get all permissions '
-            'granted to each of their groups.'
-    ),
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='accounts_users_permissions',
-        blank=True,
-        verbose_name=('user permissions'),
-        help_text=('Specific permissions for this user.'),
-    )

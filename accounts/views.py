@@ -6,8 +6,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from . models import Student, Teacher, Admin
+from django.contrib.auth.models import Group
 
 
+
+# Create the groups
+teachers_group, created = Group.objects.get_or_create(name='teachers')
+admins_group, created = Group.objects.get_or_create(name='admins')
+        
 @api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_student(request):
@@ -27,66 +33,66 @@ def create_student(request):
         return Response({'student': serializer.data}, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
+@api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_teacher(request):
-    name = request.POST.get('name')
-    phone = request.POST.get('phone')
-    mail = request.POST.get('mail')
-    password = request.POST.get('password')
+    serializer = TeacherSerializer(data=request.data)
+    if serializer.is_valid():
+        name = serializer.validated_data.get('name')
+        password = serializer.validated_data.get('password')
+        
+        # Check if the user already exists
+        try:
+            teacher = User.objects.get(username=name)
+            return Response({'success':False, 'message': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            pass
 
-    # Check if the user already exists
-    if User.objects.filter(username=name).exists:
-        return JsonResponse({'success':False, 'message': 'User already exists'})
-    
-    # Create the User object
-    user = User.objects.create_user(username=name, password=password)
-    user.is_staff = False 
-    user.is_superuser = False 
-    user.save()
-    
-    # add default permissions to each user created
-    permissions = Permission.objects.filter(codename__in=['change_Student', 'view_Student'])
-    user.user_permissions.set(permissions)
-    user.save()
+        # Create the Teacher object
+        teacher = serializer.save()
 
-    # add user role
-    user.role = User.TEACHER
-    user.save()
+        # Create the associated User object with the teacher group
+        user = User.objects.create_user(username=name, password=password)
+        user.groups.add(teachers_group)
 
-    # Return a success message
-    return JsonResponse({'success': True})
+        # Associate the user with the created teacher object
+        teacher = serializer.save(user=user)
+
+        return Response({'teacher': serializer.data}, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+@api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_admin(request):
-    name = request.POST.get('name')
-    phone = request.POST.get('phone')
-    mail = request.POST.get('mail')
-    password = request.POST.get('password')
+    serializer = AdminSerializer(data=request.data)
+    if serializer.is_valid():
+        name = serializer.validated_data.get('name')
+        password = serializer.validated_data.get('password')
+        
+        # Check if the user already exists
+        try:
+            admin = User.objects.get(username=name)
+            return Response({'success':False, 'message': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            pass
 
-    # Check if the user already exists
-    if User.objects.filter(username=name).exists:
-        return JsonResponse({'success':False, 'message': 'User already exists'})
-       
-    # Create the User object
-    user = User.objects.create_user(username=name, password=password)
-    user.is_staff = True 
-    user.is_superuser = False 
-    user.save()
+        # Create the Teacher object
+        admin = serializer.save()
 
-    # add default permissions to each user created
-    permissions = Permission.objects.filter(codename__in=['add_Person', 'change_Person', 'delete_Person', 'view_Person'])
-    user.user_permissions.set(permissions)
-    user.save()
+        # Create the associated User object with the teacher group
+        user = User.objects.create_user(username=name, password=password)
+        user.groups.add(admins_group)
 
-    # add user role
-    user.role = User.ADMIN
-    user.save()
+        # Associate the user with the created teacher object
+        teacher = serializer.save(user=user)
 
-    # Return a success message
-    return JsonResponse({'success': True})
+        return Response({'admin': serializer.data}, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @permission_required('accounts.change_Student')
 def edit_student_attendance(request, student_id):
