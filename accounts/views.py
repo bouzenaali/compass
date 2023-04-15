@@ -13,6 +13,12 @@ from django.contrib.auth.models import Group
 # Create the groups
 teachers_group, created = Group.objects.get_or_create(name='teachers')
 admins_group, created = Group.objects.get_or_create(name='admins')
+
+# Add the permissions to the groups
+teachers_group.permissions.set(Permission.objects.filter(codename__in=['change_student', 'view_student']))
+admins_group.permissions.set([Permission.objects.filter(codename__in=['change_Person', 'view_Person', 'add_Person', 'delete_Person'])])
+
+
         
 @api_view(['POST'])
 @permission_required('accounts.add_Person')
