@@ -1,35 +1,33 @@
-from django.shortcuts import render
-
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Permission
 from django.http import JsonResponse
-from django.contrib.auth.models import Permission
 from django.contrib.auth.decorators import permission_required
+from . serializers import *
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from . models import Student, Teacher, Admin
 
+
+@api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_student(request):
-    name = request.POST.get('name')
-    phone = request.POST.get('phone')
-    mail = request.POST.get('mail')
-    password = request.POST.get('password')
+    serializer = StudentSerializer(data=request.data)
+    if serializer.is_valid():
+        name = serializer.validated_data.get('name')
+        
+        # Check if the user already exists
+        try:
+            student = Student.objects.get(name=name)
+            return Response({'success':False, 'message': 'Student already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        except Student.DoesNotExist:
+            pass
 
-    # Check if the user already exists
-    if User.objects.filter(username=name).exists:
-        return JsonResponse({'success':False, 'message': 'User already exists'})
+        # Create the Student object
+        student = serializer.save()
+        return Response({'student': serializer.data}, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # Create the User object
-    user = User.objects.create_user(username=name, password=password)
-    user.is_staff = False 
-    user.is_superuser = False 
-    user.save()
-
-    # add user role
-    user.role = User.STUDENT
-    user.save()
-
-
-    # Return a success message
-    return JsonResponse({'success': True})
-
 
 @permission_required('accounts.add_Person')
 def create_teacher(request):
@@ -60,30 +58,6 @@ def create_teacher(request):
     # Return a success message
     return JsonResponse({'success': True})
 
-
-def create_superUser(request):
-    name = request.POST.get('name')
-    phone = request.POST.get('phone')
-    mail = request.POST.get('mail')
-    password = request.POST.get('password')
-
-    # Check if the user already exists
-    if User.objects.filter(username=name).exists:
-        return JsonResponse({'success':False, 'message': 'User already exists'})
-    
-    # Create the User object
-    user = User.objects.create_user(username=name, password=password)
-    user.is_staff = True 
-    user.is_superuser = True 
-    user.save()
-
-    # add user role
-    user.role = User.SUPERUSER
-    user.save()
-
-
-    # Return a success message
-    return JsonResponse({'success': True})
 
 @permission_required('accounts.add_Person')
 def create_admin(request):
