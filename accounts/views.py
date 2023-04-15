@@ -16,7 +16,7 @@ admins_group, created = Group.objects.get_or_create(name='admins')
 
 # Add the permissions to the groups
 teachers_group.permissions.set(Permission.objects.filter(codename__in=['change_student', 'view_student']))
-admins_group.permissions.set([Permission.objects.filter(codename__in=['change_Person', 'view_Person', 'add_Person', 'delete_Person'])])
+admins_group.permissions.set(Permission.objects.filter(codename__in=['change_Person', 'view_Person', 'add_Person', 'delete_Person']))
 
 
         
