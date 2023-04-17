@@ -6,7 +6,7 @@ class Course(models.Model):
     description = models.TextField(blank=True, null=True)
     c_levels = models.ManyToManyField('Level', related_name='courses')
     c_groups = models.ManyToManyField('Group', related_name='courses')
-    c_sessions = models.ManyToManyField('Session', related_name='courses')
+    c_sessions = models.ManyToManyField('Session', related_name='courses',blank=True)
 
     def __str__(self):
         return self.name
