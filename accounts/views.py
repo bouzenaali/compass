@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from . models import Student, Teacher, Admin
 from django.contrib.auth.models import Group
+from rest_framework import generics
+from courses.models import Course
 
 
 
@@ -80,7 +82,7 @@ def create_admin(request):
     if serializer.is_valid():
         name = serializer.validated_data.get('name')
         password = serializer.validated_data.get('password')
-        
+
         # Check if the user already exists
         try:
             admin = User.objects.get(username=name)
@@ -107,8 +109,7 @@ def create_admin(request):
 @api_view(['POST'])
 @permission_required('accounts.change_Student')
 def edit_student_attendance(request, student_id, session_id):
-    
-    # 1. Create Attendance model 
+     # 1. Create Attendance model 
         #
     # 2. Retrieve the student and session objects
         # student = get_object_or_404(Student, id=student_id)
@@ -141,3 +142,37 @@ def edit_student_attendance(request, student_id, session_id):
         # num_missed = attendance.filter(student=student, is_present=False).count()
         # return Response({'message': 'Attendance updated, 'attended': num_attended, 'missed': num_missed}, status=200)
     pass
+
+
+#view that lists all students
+class StudentList(generics.ListAPIView):
+    queryset=Student.objects.all()
+    serializer_class=StudentSerializer
+
+# view that retrieves/updates/destroys a student
+class StudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+#view that lists all teachers
+
+class TeacherList(generics.ListAPIView):
+    queryset=Teacher.objects.all()
+    serializer_class=TeacherSerializer
+
+# view that retrieves/updates/destroys a teacher
+class TeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+
+#view that lists all Admins
+
+class AdminList(generics.ListAPIView):
+    queryset=Admin.objects.all()
+    serializer_class=AdminSerializer
+
+# view that retrieves/updates/destroys an Admin
+class AdminRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Admin.objects.all()
+    serializer_class = AdminSerializer
+   

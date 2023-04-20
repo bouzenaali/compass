@@ -7,5 +7,7 @@ from authentication.urls import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('authentication.urls')),
-    path('accounts/', include('accounts.urls'))
+    path('accounts/', include('accounts.urls')),
+    #
+    path('courses/',include('courses.urls')),
 ]
