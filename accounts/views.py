@@ -19,7 +19,7 @@ teachers_group.permissions.set(Permission.objects.filter(codename__in=['change_s
 admins_group.permissions.set(Permission.objects.filter(codename__in=['change_Person', 'view_Person', 'add_Person', 'delete_Person']))
 
 
-        
+# create student view       
 @api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_student(request):
@@ -40,6 +40,8 @@ def create_student(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# create teacher view
 @api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_teacher(request):
@@ -70,7 +72,7 @@ def create_teacher(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+# create admin view
 @api_view(['POST'])
 @permission_required('accounts.add_Person')
 def create_admin(request):
@@ -100,9 +102,42 @@ def create_admin(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# edit student attendance view
+@api_view(['POST'])
 @permission_required('accounts.change_Student')
-def edit_student_attendance(request, student_id):
-    # modifier l'absence et la presence des etudiants
-    # il faut voir qvel es que l'etudiant ni n le group ines negh khati
-    #...
-    return JsonResponse({'success': True})
+def edit_student_attendance(request, student_id, session_id):
+    
+    # 1. Create Attendance model 
+        #
+    # 2. Retrieve the student and session objects
+        # student = get_object_or_404(Student, id=student_id)
+        # session = get_object_or_404(Session, id=session_id)
+
+    # 3. Check if the teacher is assigned to the course of the session
+        # if request.user not in session.s_group.g_teacher.all():
+        #     return Response({'message': 'Unauthorized'}, status=401)
+
+    # 4. Check if the attendance record for this student and session already exists
+        # try:
+        #     attendance = Attendance.objects.get(student=student, session=session)
+        # except Attendance.DoesNotExist:
+        #     attendance = None
+
+    # 5. Update or create the attendance record based on the "is_present" parameter
+        # is_present = request.data.get('is_present')
+        # if is_present is None:
+        #     return Response({'message': 'Missing "is_present" parameter'}, status=400)
+
+        # if attendance is not None:
+        #     attendance.is_present = is_present
+        #     attendance.save()
+        # else:
+        #     attendance = Attendance.objects.create(student=student, session=session, is_present=is_present)
+
+    # 6. Return the attendance record
+        # 
+        # num_attended = attendance.filter(student=student, is_present=True).count()
+        # num_missed = attendance.filter(student=student, is_present=False).count()
+        # return Response({'message': 'Attendance updated, 'attended': num_attended, 'missed': num_missed}, status=200)
+    pass
