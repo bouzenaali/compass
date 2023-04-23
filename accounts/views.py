@@ -9,6 +9,7 @@ from . models import Student, Teacher, Admin
 from django.contrib.auth.models import Group
 from rest_framework import generics
 from courses.models import Course
+from django.utils.decorators import method_decorator
 
 
 
@@ -145,33 +146,43 @@ def edit_student_attendance(request, student_id, session_id):
 
 
 #view that lists all students
+@method_decorator(permission_required('accounts.view_student'), name='get')
 class StudentList(generics.ListAPIView):
     queryset=Student.objects.all()
     serializer_class=StudentSerializer
 
 # view that retrieves/updates/destroys a student
+
+@method_decorator(permission_required('accounts.change_Person'), name='put')
+@method_decorator(permission_required('accounts.view_Person'), name='get')
 class StudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
 #view that lists all teachers
 
+@method_decorator(permission_required('accounts.view_student'), name='get')
 class TeacherList(generics.ListAPIView):
     queryset=Teacher.objects.all()
     serializer_class=TeacherSerializer
 
 # view that retrieves/updates/destroys a teacher
+@method_decorator(permission_required('accounts.change_Person'), name='put')
+@method_decorator(permission_required('accounts.view_Person'), name='get')
 class TeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
 
 #view that lists all Admins
 
+@method_decorator(permission_required('accounts.view_Person'), name='get')
 class AdminList(generics.ListAPIView):
     queryset=Admin.objects.all()
     serializer_class=AdminSerializer
 
 # view that retrieves/updates/destroys an Admin
+@method_decorator(permission_required('accounts.change_Person'), name='put')
+@method_decorator(permission_required('accounts.view_Person'), name='get')
 class AdminRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
