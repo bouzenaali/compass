@@ -20,9 +20,10 @@ class Level(models.Model):
 
 
 class Group(models.Model):
-    number = models.FloatField(max_length=255)
+    name = models.CharField(max_length=255)
     g_level = models.ForeignKey(Level, on_delete=models.CASCADE)
-    g_teacher = models.ForeignKey('accounts.Teacher',on_delete=models.CASCADE, default=1)
+    g_teacher = models.ForeignKey('accounts.Teacher',on_delete=models.CASCADE)
+   
 
     def __str__(self):
         return self.name
@@ -31,7 +32,7 @@ class Group(models.Model):
 class Session(models.Model):
     name = models.CharField(max_length=255)
     s_group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    s_teacher = models.ForeignKey('accounts.Teacher', on_delete=models.CASCADE, default=1 )
+    s_teacher = models.ForeignKey('accounts.Teacher', on_delete=models.CASCADE )
     date = models.DateTimeField()
     start_at = models.TimeField()
     end_at = models.TimeField()

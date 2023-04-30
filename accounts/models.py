@@ -11,13 +11,13 @@ class Person(models.Model):
         return self.name
     
 class Student(Person):
-    courses = models.ManyToManyField('courses.Course', related_name='students',blank=True, null=True)
+    courses = models.ManyToManyField('courses.Course', related_name='students',blank=True)
     is_present = models.BooleanField(default=False)
     def __str__(self):
         return self.name
     
 class Teacher(Person):
-    courses = models.ManyToManyField('courses.Course', related_name='teachers',blank=True, null=True)
+    courses = models.ManyToManyField('courses.Course', related_name='teachers',blank=True)
     password = models.CharField(max_length=255, default='password')
     def __str__(self):
         return self.name
