@@ -5,8 +5,8 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     c_levels = models.ManyToManyField('Level', related_name='courses')
-    c_groups = models.ManyToManyField('Group', related_name='courses')
-    c_sessions = models.ManyToManyField('Session', related_name='courses')
+    c_groups = models.ManyToManyField('Group', related_name='courses',blank=True, null=True)
+    c_sessions = models.ManyToManyField('Session', related_name='courses',blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -20,12 +20,13 @@ class Level(models.Model):
 
 
 class Group(models.Model):
-    number = models.FloatField(max_length=255)
+    number = models.FloatField()
+    g_course = models.ForeignKey(Course, on_delete=models.CASCADE, default=1)
     g_level = models.ForeignKey(Level, on_delete=models.CASCADE)
     g_teacher = models.ForeignKey('accounts.Teacher',on_delete=models.CASCADE, default=1)
 
     def __str__(self):
-        return self.name
+        return 'group ' + str(int(self.number))
 
 
 class Session(models.Model):
